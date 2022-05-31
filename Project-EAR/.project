@@ -3,6 +3,8 @@
 	<name>Project-EAR</name>
 	<comment></comment>
 	<projects>
+		<project>Project-WEB</project>
+		<project>Project-EJBs</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
