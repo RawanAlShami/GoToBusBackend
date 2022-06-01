@@ -1,9 +1,14 @@
 package ejbs;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.validation.constraints.NotNull;
 
 
@@ -14,16 +19,31 @@ public class User
 {
 	//MEMBER VARIABLES
 	@Id
+	int userId;
 	String userName;
 	String password;
 	String fullName;
 	String role;
 	boolean loggedIn = false;
+	
+	@ManyToMany(mappedBy="users",fetch=FetchType.EAGER)
+	private Set<Trip> trips=new HashSet<Trip>();
 
 	//DEFAULT CONSTRUCTOR
 	public User(){}
 	
 	
+	
+
+
+	public Set<Trip> getTrips() {return trips;}
+
+	public void setTrips(Set<Trip> trips) {this.trips = trips;}
+
+
+
+
+
 	//PARAMETERIZED CONSTRUCTOR
     public User(String userName, String password, String fullName, String role) 
     {
@@ -33,6 +53,10 @@ public class User
     	this.role=role;
     }
     
+    
+    public void addTrip(Trip trip) {
+    	this.trips.add(trip);
+    }
 
     //SETTERS AND GETTERS
 	public void setUserName(String userName) {	this.userName = userName;	}
@@ -53,5 +77,11 @@ public class User
 	
 	public void setLoggedIn(boolean loggedIn) {	this.loggedIn = loggedIn;	}
 	public boolean isLoggedIn() {	return loggedIn;	}
+	
+	public int getUserId() {return userId;}
+
+
+	public void setUserId(int userId) {this.userId = userId;}
+
 	
 }

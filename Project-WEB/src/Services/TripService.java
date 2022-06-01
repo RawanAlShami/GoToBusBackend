@@ -8,12 +8,15 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.ws.rs.Path;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+
+import ejbs.Station;
 import ejbs.Trip;
 import ejbs.User;
 
@@ -33,27 +36,35 @@ public class TripService
 		
 	@POST
 	@Path("/trip")
-	public String createTrip(Trip trip) 
+	public Trip createTrip(Trip trip) 
 	{
+		/*{"tripId":2,
+			"fromStation":1,
+			"toStation": 2,
+			"availableSeats": 20,
+			"departureTime": "25/05/2022 15:00:00", "arrivalTime": "25/05/2022 20:00:00"
+		}*/
+		
 		entityManager.persist(trip);
 		if(trip==null)
-			return "Failed To Add Trip";
-		return "Trip Added Successfully";
+			return trip;
+		return trip;
 	}
 	
-	
+	//WE NEED TO ADD FROM AND TO DATES AND GET ALL TRIPS IN BETWEEN 
 	@POST
 	@Path("/searchTrip")
 	public List<Trip> searchTrip(Trip testTrip)
 	{
-		//T.getToStation() T.getFromStation() T.getDepartureTime() T.getArrivalTime()
+		String fromStation=testTrip.getFromStation();
+		String toStation=testTrip.getToStation();
 		
-		/*List<Trip> trips=entityManager.createQuery("SELECT T FROM Trip T where T.getToStation()=:testTrip.getToStation() AND "
-				+ "T.getFromStation()=:testTrip.getFromStation() AND T.getDepartureTime()=:testTrip.getDepartureTime() AND "
-				+ "T.getArrivalTime()=:testTrip.getArrivalTime()").getResultList();*/
+		TypedQuery<Trip> t=entityManager.createQuery("SELECT T FROM Trip T where T.fromStation=:fromStatId AND T.toStation=:toStatId" , Trip.class);
+		t.setParameter("fromStatId", fromStation);
+		t.setParameter("toStatId", toStation);
+		List<Trip> trips=t.getResultList();
+		return trips;
 		
-		
-		
-		return null;
 	}
+	
 }

@@ -1,9 +1,16 @@
 package ejbs;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.JoinColumn;
 
 
 @Stateless
@@ -20,6 +27,10 @@ public class Trip
 	private String arrivalTime;
 	private String departureTime;
 	
+	@ManyToMany(fetch=FetchType.EAGER)
+	@JoinTable(name="UsersTrips",joinColumns=@JoinColumn(name="TripID"),inverseJoinColumns=@JoinColumn(name="UserID"))
+	private Set<User> users=new HashSet<User>();
+	
 	//CONSTRUCTOR
     public Trip() {}
 
@@ -34,8 +45,18 @@ public class Trip
     	this.departureTime=departureTime;
     }
     
-    
-    //SETTERS AND GETTERS
+    public void addUser(User user) {
+    	this.users.add(user);
+    }
+ 
+
+
+	public void setUsers(Set<User> users) {
+		this.users = users;
+	}
+
+
+	//SETTERS AND GETTERS
 	public int getTripId() {	return tripId;	}
 	public void setTripId(int tripId) {	this.tripId = tripId;	}
 	

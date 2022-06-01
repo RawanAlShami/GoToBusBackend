@@ -13,7 +13,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import ejbs.Trip;
 import ejbs.User;
+import ejbs.ids;
 
 
 @Stateless
@@ -25,10 +27,13 @@ public class UserService
 	@EJB
 	User user;
 	
+	@EJB
+	Trip trip;
+	
 	@PersistenceContext(unitName="hello")
 	EntityManager entityManager;
 	
-
+	
 		
 	@POST
 	@Path("/user")
@@ -66,6 +71,20 @@ public class UserService
 	public User getUserByUserName(@PathParam("username") String username)
 	{
 		return entityManager.find(User.class, username);
+	}
+	
+	@POST
+	@Path("/bookTrip")
+	public User bookTrip(ids userTripId)
+	{
+		User user=entityManager.find(User.class, userTripId.getUserId());
+		Trip trip=entityManager.find(Trip.class, userTripId.getTripId());
+		
+		user.addTrip(trip);
+		trip.addUser(user);
+		
+		
+		return user;
 	}
 	
 }
