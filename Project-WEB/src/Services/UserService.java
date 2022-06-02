@@ -28,6 +28,20 @@ import ejbs.ids;
 @Consumes(MediaType.APPLICATION_JSON)
 public class UserService 
 {
+	/*{"fromStation":"Cairo",
+"toStation": "Giza",
+"availableSeats": 10,
+"departureTime": "25/05/2022 15:00:00", "arrivalTime": "25/05/2022 20:00:00"
+}*/
+/*{
+    "userName": "Mado",
+    "password": "123456",
+    "fullName": "Mohammed Kelany",
+    "role": "User"
+}
+*/
+	/*{"tripId":4,
+"userId":1}*/
 	@EJB
 	User user;
 	
@@ -97,23 +111,30 @@ public class UserService
 		LocalDateTime LocalDateTimeNow = LocalDateTime.now();
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 		String formattedDateAndTime = LocalDateTimeNow.format(dateTimeFormatter);
-		
+		//if(user.isLoggedIn()) {
 		if(availableSeats>1)
 		{
 			user.addTrip(trip);
 			trip.addUser(user);
 			
 			Notifications bookTripNotification=new Notifications("You have booked a trip from "+ fromStation+ " to "+ toStation +" successfully",formattedDateAndTime);
-			
+			entityManager.persist(bookTripNotification);
 			user.addNotification(bookTripNotification);
+			bookTripNotification.setUser(user);
+			
+			
 		}
 		else
 		{
 			Notifications bookTripNotification=new Notifications("Sorry, trip "+ fromStation+ " to "+ toStation +" has no available seats",formattedDateAndTime);
-			
+			entityManager.persist(bookTripNotification);
 			user.addNotification(bookTripNotification);
+			bookTripNotification.setUser(user);
+			
 		}
 		return user;
+		//}else
+			//return null;
 	}
 	
 	@GET
