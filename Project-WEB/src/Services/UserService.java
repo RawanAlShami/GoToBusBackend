@@ -1,10 +1,14 @@
 package Services;
 
-import javax.annotation.Resource;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Set;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -12,14 +16,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-
+import ejbs.Notifications;
 import ejbs.Trip;
 import ejbs.User;
 import ejbs.ids;
 
 
 @Stateless
-@Path("/apiUser")
+@Path("/api")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class UserService 
@@ -27,13 +31,8 @@ public class UserService
 	@EJB
 	User user;
 	
-	@EJB
-	Trip trip;
-	
 	@PersistenceContext(unitName="hello")
 	EntityManager entityManager;
-	
-	
 		
 	@POST
 	@Path("/user")
@@ -47,21 +46,23 @@ public class UserService
 	
 	
 	@POST
-	@Path("/userLogin")
+	@Path("/login")
 	public String loginAsUser(User testUser)
 	{
-		User user=entityManager.find(User.class, testUser.getUserName());
-			
-		if(user==null)
-			return "Invalid UserName Provided";
+		String testUserName=testUser.getUserName();
+		String testPassword=testUser.getPassword();
+		
+		TypedQuery<User> u=entityManager.createQuery("SELECT U FROM User U where U.userName=:testUserName AND U.password=:testPassword" , User.class);
+		u.setParameter("testUserName", testUserName);
+		u.setParameter("testPassword", testPassword);
+		List<User> users=u.getResultList();
+		
+		if(users.isEmpty())
+			return "Invalid Credidentials Provided";
 		else
 		{
-			if(user.getPassword().equals(testUser.getPassword()))
-			{
-				user.setLoggedIn(true);
-				return "User Logged In Successfully";
-			}
-			return "Invalid Password Provided";
+			users.get(0).setLoggedIn(true);
+			return "User Logged In Successfully";
 		}
 	}
 	
@@ -69,22 +70,67 @@ public class UserService
 	@GET
 	@Path("/getUser/{username}")
 	public User getUserByUserName(@PathParam("username") String username)
-	{
-		return entityManager.find(User.class, username);
+	{	
+		String uname=username;
+		
+		TypedQuery<User> u=entityManager.createQuery("SELECT U FROM User U where U.userName=:uname" , User.class);
+		u.setParameter("uname", uname);
+		List<User> users=u.getResultList();
+		
+		return users.get(0);
 	}
 	
 	@POST
-	@Path("/bookTrip")
+	@Path("/booktrip")
 	public User bookTrip(ids userTripId)
 	{
-		User user=entityManager.find(User.class, userTripId.getUserId());
-		Trip trip=entityManager.find(Trip.class, userTripId.getTripId());
+		int testUserId=userTripId.getUserId();
+		int testTripId=userTripId.getTripId();
 		
-		user.addTrip(trip);
-		trip.addUser(user);
+		User user=entityManager.find(User.class, testUserId);
+		Trip trip=entityManager.find(Trip.class, testTripId);
 		
+		int availableSeats=trip.getAvailableSeats();
+		String fromStation=trip.getFromStation();
+		String toStation=trip.getToStation();
 		
+		LocalDateTime LocalDateTimeNow = LocalDateTime.now();
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+		String formattedDateAndTime = LocalDateTimeNow.format(dateTimeFormatter);
+		
+		if(availableSeats>1)
+		{
+			user.addTrip(trip);
+			trip.addUser(user);
+			
+			Notifications bookTripNotification=new Notifications("You have booked a trip from "+ fromStation+ " to "+ toStation +" successfully",formattedDateAndTime);
+			
+			user.addNotification(bookTripNotification);
+		}
+		else
+		{
+			Notifications bookTripNotification=new Notifications("Sorry, trip "+ fromStation+ " to "+ toStation +" has no available seats",formattedDateAndTime);
+			
+			user.addNotification(bookTripNotification);
+		}
 		return user;
+	}
+	
+	@GET
+	@Path("/viewtrips/{userId}")
+	public Set<Trip> viewUserTrips(@PathParam("userId") int userId)
+	{
+		User user=entityManager.find(User.class, userId);
+		return user.getTrips();
+	}
+	
+	@GET
+	@Path("/notifications/{user_id}")
+	public Set<Notifications> showUserNotifications(@PathParam("userId") int userId)
+	{
+		int uID=userId;
+		User user=entityManager.find(User.class, uID);
+		return user.getNotifications();
 	}
 	
 }

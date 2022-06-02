@@ -1,12 +1,15 @@
 package ejbs;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -20,13 +23,15 @@ public class Trip
 {
 	//ATTRIBUTES
 	@Id
-	private int tripId;
-	private String fromStation;
-	private String toStation;
-	private int availableSeats;
-	private String arrivalTime;
-	private String departureTime;
-	
+	@GeneratedValue(strategy=GenerationType.AUTO)
+	int tripId;
+	String fromStation;
+	String toStation;
+	int availableSeats;
+	String arrivalTime;
+	String departureTime;
+
+
 	@ManyToMany(fetch=FetchType.EAGER)
 	@JoinTable(name="UsersTrips",joinColumns=@JoinColumn(name="TripID"),inverseJoinColumns=@JoinColumn(name="UserID"))
 	private Set<User> users=new HashSet<User>();
@@ -35,32 +40,24 @@ public class Trip
     public Trip() {}
 
     
-    public Trip(int tripId,String fromStation,String toStation,int availableSeats,String arrivalTime,String departureTime) 
+    public Trip(String fromStation,String toStation,int availableSeats,LocalDateTime arrivalTime,LocalDateTime departureTime) 
     {
-    	this.tripId=tripId;
+    	DateTimeFormatter dateTimeFormatter=DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+    	String formattedArrivalDate= arrivalTime.format(dateTimeFormatter);
+    	String formattedDepartureDate=departureTime.format(dateTimeFormatter);
+    	
     	this.fromStation=fromStation;
     	this.toStation=toStation;
     	this.availableSeats=availableSeats;
-    	this.arrivalTime=arrivalTime;
-    	this.departureTime=departureTime;
+    	this.arrivalTime=formattedArrivalDate;
+    	this.departureTime=formattedDepartureDate;
     }
-    
-    public void addUser(User user) {
-    	this.users.add(user);
-    }
- 
-
-
-	public void setUsers(Set<User> users) {
-		this.users = users;
-	}
-
 
 	//SETTERS AND GETTERS
-	public int getTripId() {	return tripId;	}
 	public void setTripId(int tripId) {	this.tripId = tripId;	}
-	
-	
+    public int getTripId() { return tripId; }
+    
+    
 	public void setFromStation(String fromStation) {  this.fromStation = fromStation;	}
 	public String getFromStation() {  return fromStation;	}
 
@@ -78,5 +75,10 @@ public class Trip
 	
 	public void setDepartureTime(String departureTime) {	this.departureTime = departureTime;	}
 	public String getDepartureTime() {  return departureTime;	}
-
+	
+	
+	public void setUsers(Set<User> users) {	this.users = users;	}
+	
+	public void addUser(User user) { this.users.add(user); }
+   
 }

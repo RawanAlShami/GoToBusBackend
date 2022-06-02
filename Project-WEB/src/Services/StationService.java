@@ -16,7 +16,7 @@ import ejbs.Station;
 
 
 @Stateless
-@Path("/apiStation")
+@Path("/api")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class StationService 
@@ -40,7 +40,7 @@ public class StationService
 	
 	
 	@GET
-	@Path("/getStation/{stationName}")
+	@Path("/station/{stationName}")
 	public Station getUserByUserName(@PathParam("stationName") String stationName)
 	{
 		return entityManager.find(Station.class, stationName);
