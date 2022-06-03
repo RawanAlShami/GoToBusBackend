@@ -149,8 +149,8 @@ public class UserService
 	@Path("/notifications/{user_id}")
 	public Set<Notifications> showUserNotifications(@PathParam("userId") int userId)
 	{
-		int uID=userId;
-		User user=entityManager.find(User.class, uID);
+		//int uID=userId;
+		User user=entityManager.find(User.class, userId);
 		return user.getNotifications();
 	}
 	

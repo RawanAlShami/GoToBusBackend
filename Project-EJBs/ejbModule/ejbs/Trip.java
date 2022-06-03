@@ -36,6 +36,7 @@ public class Trip
 	@JoinTable(name="UsersTrips",joinColumns=@JoinColumn(name="TripID"),inverseJoinColumns=@JoinColumn(name="UserID"))
 	private Set<User> users=new HashSet<User>();
 	
+	
 	//CONSTRUCTOR
     public Trip() {}
 

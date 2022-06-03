@@ -42,9 +42,15 @@ public class Notifications
 	public int getNotificationId() { return notificationId; }
 	
 	public void setMessage(String message) { this.message = message;	}
-	public String getMessage() { return message; }
+	public String getMessage() {return message; }
 	
 	public void setCurrentTime(String currentTime) { this.currentTime = currentTime; }
 	public String getCurrentTime() { return currentTime; }
+
+	
+
+	public void setUser(User user) {this.user = user;};
+	
+	
 	
 }

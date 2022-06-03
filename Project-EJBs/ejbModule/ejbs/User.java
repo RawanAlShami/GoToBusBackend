@@ -31,7 +31,9 @@ public class User
 	@ManyToMany(mappedBy="users",fetch=FetchType.EAGER)
 	private Set<Trip> trips=new HashSet<Trip>();
 	
-	@OneToMany(mappedBy="notificationId",fetch=FetchType.EAGER)
+
+	
+	@OneToMany(mappedBy="user",fetch=FetchType.EAGER)
 	private Set<Notifications> notifications=new HashSet<Notifications>();
 	
 	//DEFAULT CONSTRUCTOR
@@ -68,6 +70,14 @@ public class User
 	public boolean isLoggedIn() {	return loggedIn;	}
 
 	
+	public int getUserId() {
+		return userId;
+	}
+
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
+
 	public void setTrips(Set<Trip> trips) {	this.trips = trips;	}
 	public Set<Trip> getTrips() {	return trips;	}
 

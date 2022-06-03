@@ -40,5 +40,6 @@ public class Station
 
 	public void setLongitude(String longitude) {	this.longitude = longitude;	}
 	public String getLongitude() {	return longitude;	}
+	
 
 }
